@@ -18,38 +18,19 @@ $futureDate=date('Y-m-d', $fourMonthAgo);
 $log = get_visitor_log($_SESSION['user']->guid, $fourMonthAgo);
 $friendLog = get_friends_log($_SESSION['user']->guid, $fourMonthAgo);
 
-
-
 $midnight =  strtotime('today midnight');
-
-
-
-echo $midnight;
-echo date('l jS \of F Y h:i:s A', $midnight);
-
 $lastnight = strtotime('-1 day', $midnight);
-echo date('l jS \of F Y h:i:s A', $lastnight);
 $firstDayInMonth = strtotime("first day of this month midnight");
-echo date('l jS \of F Y h:i:s A', $firstDayInMonth);
-echo "<br>";
-echo date('l jS \of F Y h:i:s A', date('01-m-Y'));
 
 $dayLabel = array();
 array_push($dayLabel,date('d M Y', $midnight), date('d M Y', strtotime('-1 day', $midnight)), date('d M Y', strtotime('-2 day', $midnight)), date('d M Y', strtotime('-3 day', $midnight)), date('d M Y', strtotime('-4 day', $midnight)), date('d M Y', strtotime('-5 day', $midnight)), date('d M Y', strtotime('-6 day', $midnight)));
-echo json_encode($dayLabel);
-echo "<br>";
 $weekLabel = array();
 array_push($weekLabel,date('d M Y', strtotime("-6 day", $midnight))." - ".date('d M Y', $midnight), date('d M Y', strtotime("-13 day", $midnight))." - ".date('d M Y', strtotime("-6 day", $midnight)), date('d M Y', strtotime("-20 day", $midnight))." - ".date('d M Y', strtotime("-13 day", $midnight)), date('d M Y', strtotime("-21 day", $midnight))." - ".date('d M Y', strtotime("-20 day", $midnight)));
-echo json_encode($monthLabel);
-echo "<br>";
 $monthLabel = array();
 $firstMonth = strtotime("first day of this month midnight");
 $SecondMonth = strtotime("-1 month", $firstMonth);
 $ThirdMonth = strtotime("-2 month", $firstMonth);
 array_push($monthLabel,date('M Y', $firstMonth),date('M Y', $SecondMonth),date('M Y', $ThirdMonth));
-echo json_encode($monthLabel);
-echo "<br>";
-
 
 $days = array();
 $weeks = array();
@@ -60,64 +41,7 @@ $monthCountry = get_visitor_country($_SESSION['user']->guid, $firstMonth);
 $friendsDays = array();
 $friendsWeeks = array();
 $friendsMonth = array();
-$mostCommentBlogToday = get_most_comment_blog_by_user($_SESSION['user']->guid, $midnight);
-$mostCommentBlogWeek = get_most_comment_blog_by_user($_SESSION['user']->guid, strtotime("-6 day", $midnight));
-$mostCommentBlogMonth = get_most_comment_blog_by_user($_SESSION['user']->guid, strtotime("-29 day", $midnight));
-$mostCommentBlogToday = array_filter($mostCommentBlogToday);
-$mostCommentBlogWeek = array_filter($mostCommentBlogWeek);
-$mostCommentBlogMonth = array_filter($mostCommentBlogMonth);
 
-if (!empty($mostCommentBlogToday)) {
-	foreach ($mostCommentBlogToday as $c){
-		$blogEntity = get_entity($c->guid);
-		$mostCommentBlogTodayInfo = "<p>" . elgg_echo('blog') . ": <a href=\"{$blogEntity->getURL()}\">{$blogEntity->title} ({$c->count})</a></p>";
-	}
-}  else {
-	$mostCommentBlogTodayInfo = "<p> No comments yet. </p>";
-}
-
-if (!empty($mostCommentBlogWeek)) {
-	foreach ($mostCommentBlogWeek as $c){
-		$blogEntity = get_entity($c->guid);
-		$mostCommentBlogWeekInfo = "<p>" . elgg_echo('blog') . ": <a href=\"{$blogEntity->getURL()}\">{$blogEntity->title} ({$c->count})</a></p>";
-	}
-}  else {
-	$mostCommentBlogWeekInfo = "<p> No comments yet. </p>";
-}
-
-
-if (!empty($mostCommentBlogMonth)) {
-	foreach ($mostCommentBlogMonth as $c){
-		$blogEntity = get_entity($c->guid);
-		$mostCommentBlogMonthInfo = "<p>" . elgg_echo('blog') . ": <a href=\"{$blogEntity->getURL()}\">{$blogEntity->title} ({$c->count})</a></p>";
-	}
-}  else {
-	$mostCommentBlogMonthInfo = "<p> No comments yet. </p>";
-}
-
-echo $mostCommentBlogMonthInfo;
-
-
-echo json_encode($mostCommentBlogToday);
-echo json_encode($mostCommentBlogWeek);
-echo json_encode($mostCommentBlogMonth);
-
-echo json_encode($dayCountry);
-echo "<br>";
-
-echo json_encode($weekCountry);
-echo "<br>";
-
-echo json_encode($monthCountry);
-echo "<br>";
-
-foreach ($monthCountry as $c){
-	echo $c->string." ".$c->count."".$c->id;
-	echo "<br>";
-}
-
-
-echo "test";
 foreach ($log as $l)
 {
 	$time_created = $l->time_created;
@@ -178,17 +102,6 @@ foreach ($friendLog as $l)
 
 }
 
-echo "friends list <br>";
-echo json_encode($friendsDays);
-echo "<br>";
-
-echo json_encode($friendsWeeks);
-echo "<br>";
-
-echo json_encode($friendsMonth);
-echo "<br>";
-
-
 ?>
 
 
@@ -240,23 +153,6 @@ echo "<br>";
 </div>
 
 
-<div id="tabs2">
-	<ul>
-		<li><a href="#tabs2-1">Today</a></li>
-		<li><a href="#tabs2-2">Last 7 days</a></li>
-		<li><a href="#tabs2-3">Last 30 days</a></li>
-	</ul>
-	<div id="tabs2-1">
-		<div id="chart2-1" style="height:400px; width:920px;"><?php echo $mostCommentBlogTodayInfo ?></div>
-	</div>
-	<div id="tabs2-2">
-		<div id="chart2-2" style="height:400px; width:920px;"><?php echo $mostCommentBlogWeekInfo ?></div>
-	</div>
-	<div id="tabs2-3">
-		<div id="chart2-3" style="height:400px; width:920px;"><?php echo $mostCommentBlogMonthInfo ?></div>
-	</div>
-</div>
-
 <div id="tabs3">
 	<ul>
 		<li><a href="#tabs3-1">Days</a></li>
@@ -278,6 +174,7 @@ echo "<br>";
 <style>
 	#one_column {
 		background-color: rgba(0, 0, 0, 0);
+		margin-top: 380px;
 	}
 	.ui-tabs {
 		width: 100%;
@@ -312,7 +209,7 @@ echo "<br>";
 		var times = 7;
 		var bar1 = [];
 		var showEmptyMsg = true;
-		for(var i=0; i < times; i++){
+		for(var i=(times-1); i >= 0; i--){
 			var value = days[i];
 			if (value === undefined){
 				value = 0;
@@ -321,18 +218,6 @@ echo "<br>";
 			}
 			bar1.push([dayLabel[i], value])
 		}
-
-
-
-
-//		var bar1 = [['Apples',11],['Oranges',7],['Pears',3],['Bananas',9],['Lemons',5]];
-		var data1 = [3,1,2,3,5,4];
-		var data2 = [4,3,3,4,5,6];
-		var data3 = [9,10,8,7,4,6];
-		var data4 = [9,8,7,12,9,10];
-		var pie1 = [
-			['Black', 212],['White', 140], ['Red', 131],['Blue', 510]
-		];
 
 		if (!showEmptyMsg){
 			$.jqplot('chart1-1', [bar1],{
@@ -360,7 +245,7 @@ echo "<br>";
 		times = 4;
 		showEmptyMsg = true;
 		var bar2 = [];
-		for(i=0; i < times; i++){
+		for(i=(times-1); i >= 0; i--){
 			value = weeks[i];
 			if (value === undefined){
 				value = 0;
@@ -396,7 +281,7 @@ echo "<br>";
 		times = 3;
 		showEmptyMsg = true;
 		var bar3 = [];
-		for(i=0; i < times; i++){
+		for(i=(times-1); i >= 0; i--){
 			value = months[i];
 			if (value === undefined){
 				value = 0;
@@ -427,59 +312,12 @@ echo "<br>";
 			$("#chart1-3").text("No Visitors Yet.")
 		}
 
-
-
-
-//		$.jqplot('chart2-1', [bar1],{
-//			title: 'The most commented postings',
-//			series:[{renderer:$.jqplot.BarRenderer}],
-//			axesDefaults: {
-//				tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
-//				tickOptions: {
-//					angle: -30,
-//					fontSize: '10pt'
-//				}
-//			},
-//			axes: {
-//				xaxis: {
-//					renderer: $.jqplot.CategoryAxisRenderer
-//				}
-//			}
-//		});
-//
-//		$.jqplot('chart2-2', [data1,data2,data3,data4],{
-//			title: 'The most commented postings'
-//		});
-//
-//		$.jqplot('chart2-3', [bar1],{
-//			title: 'The most commented postings',
-//			seriesDefaults: {
-//				renderer: jQuery.jqplot.PieRenderer,
-//				rendererOptions: {
-//					showDataLabels: true,
-//					dataLabels: 'value',
-//					sliceMargin: 6,
-//					lineWidth: 5
-//				}
-//			},
-//			legend: {
-//				show: true,
-//				location: 'e',
-//				renderer: $.jqplot.EnhancedPieLegendRenderer  ,
-//				rendererOptions: {
-//					numberColumns: 1
-//				},
-//				marginRight: '17%'
-//			}
-//		});
-
-
 		var friendsDays = <?php echo json_encode($friendsDays) ?>;
 
 		times = 7;
 		showEmptyMsg = true;
 		var bar4 = [];
-		for(i=0; i < times; i++){
+		for(i=(times-1); i >= 0; i--){
 			value = friendsDays[i];
 			if (value === undefined){
 				value = 0;
@@ -514,7 +352,7 @@ echo "<br>";
 		times = 4;
 		showEmptyMsg = true;
 		var bar5 = [];
-		for(i=0; i < times; i++){
+		for(i=(times-1); i >= 0; i--){
 			value = friendsWeeks[i];
 			if (value === undefined){
 				value = 0;
@@ -549,7 +387,7 @@ echo "<br>";
 		times = 3;
 		showEmptyMsg = true;
 		var bar6 = [];
-		for(i=0; i < times; i++){
+		for(i=(times-1); i >= 0; i--){
 			value = friendsMonth[i];
 			if (value === undefined){
 				value = 0;
@@ -681,7 +519,6 @@ echo "<br>";
 		}
 
 		$("#tabs1").tabs();
-		$("#tabs2").tabs();
 		$("#tabs3").tabs();
 		$("#tabs4").tabs();
 

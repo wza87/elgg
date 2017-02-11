@@ -87,17 +87,6 @@ if ((isset($CONFIG->https_login)) && ($CONFIG->https_login)) {
 			});
 	}
 
-	var signinChanged = function (val) {
-		if (auth2){
-			googleUser = auth2.currentUser.get();
-			onSignIn(googleUser);
-		}
-
-	};
-
-
-
-
 	function onSignIn(googleUser) {
 		var profile = googleUser.getBasicProfile();
 		console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
@@ -116,14 +105,11 @@ if ((isset($CONFIG->https_login)) && ($CONFIG->https_login)) {
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
 			document.location.href = "<?php echo $vars['url'] ?>action/fbregister?__elgg_token=<?php echo $token ?>&__elgg_ts=<?php echo $ts ?>&sso=facebook&token=" + encodeURI(response.authResponse.accessToken);
-//			testAPI();
 		} else if (response.status === 'not_authorized') {
 			// The person is logged into Facebook, but not your app.
-			document.getElementById('status').innerHTML = 'Please log ' +
-				'into this app.';
+			alert("You are not not_authorized");
 		} else {
-			document.getElementById('status').innerHTML = 'Please log ' +
-				'into Facebook.';
+			alert("You are not not_authorized");
 		}
 	}
 
@@ -142,10 +128,6 @@ if ((isset($CONFIG->https_login)) && ($CONFIG->https_login)) {
 			version    : 'v2.8' // use graph api version 2.8
 		});
 
-//  FB.getLoginStatus(function(response) {
-		//  statusChangeCallback(response);
-//  });
-
 	};
 
 	// Load the SDK asynchronously
@@ -157,24 +139,7 @@ if ((isset($CONFIG->https_login)) && ($CONFIG->https_login)) {
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
 
-	// Here we run a very simple test of the Graph API after login is
-	// successful.  See statusChangeCallback() for when this call is made.
-	function testAPI() {
-		console.log('Welcome!  Fetching your information.... ');
 
-		FB.api('/me?fields=id,name,email', function (response) {
-			console.log('Successful login for: ' + response);
-			var email = response.email,
-				userId = response.id,
-				name = response.name;
-
-			document.location.href = "<?php echo $vars['url'] ?>action/fbregister?__elgg_token=<?php echo $token ?>&__elgg_ts=<?php echo $ts ?>&email=" + encodeURI(email) + "&name=" + encodeURI(name) + "&userId=" + encodeURI(userId);
-
-
-
-
-		});
-	}
 
 
 	$(document).ready(function() { $('input[name=username]').focus(); });

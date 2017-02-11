@@ -145,6 +145,41 @@ function get_system_log($by_user = "", $event = "", $class = "", $type = "", $su
 	return false;
 }
 
+function count_visitor_log($owner = "", $timeafter = 0, $timebefore = 0) {
+    global $CONFIG;
+
+    $owner = (int)$owner;
+    $event = "Visitor";
+    $class = "ElggMetaStrings";
+
+    $where = array();
+
+    $where[] = "owner_guid=$owner";
+
+    if ($event != "") {
+        $where[] = "event='$event'";
+    }
+    if ($class!=="") {
+        $where[] = "object_class='$class'";
+    }
+
+    if ($timeafter) {
+        $where[] = "time_created > " . ((int) $timeafter);
+    }
+
+    if ($timebefore) {
+        $where[] = "time_created < " . ((int) $timebefore);
+    }
+
+    $query = "SELECT count(*) as count from {$CONFIG->dbprefix}system_log where 1 ";
+    foreach ($where as $w) {
+        $query .= " and $w";
+    }
+
+    return get_data($query);
+
+}
+
 function get_visitor_log($owner = "", $timeafter = 0) {
     global $CONFIG;
 
@@ -220,7 +255,21 @@ function get_most_comment_blog_by_user($owner = "", $timeafter = 0) {
     $owner = (int)$owner;
     $timeafter = (int)$timeafter;
 
-    $query = "SELECT e.guid, count(e.guid) as count FROM {$CONFIG->dbprefix}entities e join {$CONFIG->dbprefix}entity_subtypes es on e.subtype = es.id and es.subtype='blog' and e.owner_guid=$owner join {$CONFIG->dbprefix}annotations a on a.entity_guid = e.guid and a.time_created > $timeafter group by e.guid order by count;";
+    $query = "SELECT e.guid, count(e.guid) as count FROM {$CONFIG->dbprefix}entities e join {$CONFIG->dbprefix}entity_subtypes es on e.subtype = es.id and es.subtype='blog' and e.owner_guid=$owner join {$CONFIG->dbprefix}annotations a on a.entity_guid = e.guid and a.time_created > $timeafter group by e.guid order by count desc limit 3;";
+
+
+    return get_data($query, "entity_row_to_elggstar");
+
+}
+
+function count_new_comments($owner = "", $timeafter = 0, $timebefore = 0) {
+    global $CONFIG;
+
+    $owner = (int)$owner;
+    $timeafter = (int)$timeafter;
+    $timebefore = (int)$timebefore;
+
+    $query = "SELECT count(*) as count FROM {$CONFIG->dbprefix}entities e join {$CONFIG->dbprefix}entity_subtypes es on e.subtype = es.id and es.subtype='blog' and e.owner_guid=$owner join {$CONFIG->dbprefix}annotations a on a.entity_guid = e.guid and a.time_created > $timeafter and a.time_created < $timebefore ;";
 
 
     return get_data($query, "entity_row_to_elggstar");;
@@ -254,6 +303,44 @@ function get_friends_log($performed_by_guid = "", $timeafter = 0) {
 
 
     $query = "SELECT sl.time_created, er.guid_two FROM {$CONFIG->dbprefix}entity_relationships er JOIN {$CONFIG->dbprefix}system_log sl ON er.id = sl.object_id ";
+    foreach ($where as $w) {
+        $query .= " and $w";
+    }
+
+    return get_data($query);
+
+}
+
+function count_friends_log($performed_by_guid = "", $timeafter = 0, $timebefore) {
+    global $CONFIG;
+
+    $performed_by_guid = (int)$performed_by_guid;
+    $event = "create";
+    $class = "ElggRelationship";
+    $objectSubtype = "friend";
+
+    $where = array();
+
+    $where[] = "er.relationship='$objectSubtype'";
+    $where[] = "sl.performed_by_guid=$performed_by_guid";
+    $where[] = "sl.object_subtype='$objectSubtype'";
+
+    if ($event != "") {
+        $where[] = "sl.event='$event'";
+    }
+    if ($class!=="") {
+        $where[] = "sl.object_class='$class'";
+    }
+
+    if ($timeafter) {
+        $where[] = "sl.time_created > " . ((int) $timeafter);
+    }
+
+    if ($timebefore) {
+        $where[] = "sl.time_created < " . ((int) $timebefore);
+    }
+
+    $query = "SELECT count(*) as count FROM {$CONFIG->dbprefix}entity_relationships er JOIN {$CONFIG->dbprefix}system_log sl ON er.id = sl.object_id ";
     foreach ($where as $w) {
         $query .= " and $w";
     }
